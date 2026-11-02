@@ -1,0 +1,5 @@
+import { scopedSchema, model, objectId, mongoose } from './base.js'
+const assignmentSchema = new mongoose.Schema({ employeeId: { type: objectId, ref: 'Employee', required: true }, brandId: { type: objectId, ref: 'Brand', required: true }, processId: { type: objectId, ref: 'Process', required: true }, date: { type: Date, required: true }, shift: { type: String, trim: true, maxlength: 40 }, kind: { type: String, enum: ['shift','weekly-off','leave','holiday'], default: 'shift' }, status: { type: String, enum: ['scheduled','confirmed','cancelled'], default: 'scheduled' } })
+const schema = scopedSchema({ year: { type: Number, required: true, min: 2000, max: 2200 }, month: { type: Number, required: true, min: 1, max: 12 }, name: { type: String, trim: true, maxlength: 120 }, assignments: { type: [assignmentSchema], default: [] }, status: { type: String, enum: ['draft','published'], default: 'draft' }, createdBy: { type: objectId, ref: 'User' } })
+schema.index({ workspaceId: 1, year: 1, month: 1 }, { unique: true })
+export default model('Roster', schema)

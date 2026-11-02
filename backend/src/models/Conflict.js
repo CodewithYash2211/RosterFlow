@@ -1,0 +1,4 @@
+import { scopedSchema, model, objectId } from './base.js'
+const schema = scopedSchema({ title: { type: String, required: true, trim: true, maxlength: 200 }, severity: { type: String, enum: ['Low','Medium','High'], default: 'Low' }, kind: { type: String, enum: ['staffing','weekly-off','availability','coverage-gap','leave'], required: true }, brandId: { type: objectId, ref: 'Brand' }, processId: { type: objectId, ref: 'Process' }, date: Date, employeeIds: [{ type: objectId, ref: 'Employee' }], status: { type: String, enum: ['open','resolved','dismissed'], default: 'open' }, details: { type: String, trim: true, maxlength: 2000 }, resolution: { type: String, trim: true, maxlength: 2000 }, resolvedBy: { type: objectId, ref: 'User' }, resolvedAt: Date })
+schema.index({ workspaceId: 1, status: 1, severity: 1, date: 1 })
+export default model('Conflict', schema)

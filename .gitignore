@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+!backend/.env.example
+node_modules/
+dist/
+
+# Firebase Admin credentials
+backend/serviceAccountKey.json
+backend/*.service-account.json
+backend/.env
+
