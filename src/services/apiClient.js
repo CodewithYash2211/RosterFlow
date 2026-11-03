@@ -1,9 +1,10 @@
 import { auth } from '../lib/firebase'
+import { isLiveWorkspaceMode } from '../lib/workspaceMode'
 
-export const liveApiEnabled = import.meta.env.VITE_DATA_MODE === 'live'
 const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '')
 
 export async function apiRequest(path, { method = 'GET', body, headers = {} } = {}) {
+  if (!isLiveWorkspaceMode()) throw new Error('The live workspace API is not active in Demo Mode.')
   const user = auth?.currentUser
   if (!user) throw new Error('Sign in is required to use the live workspace API.')
   const token = await user.getIdToken()

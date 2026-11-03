@@ -1,4 +1,5 @@
 const demoEvent = 'rosterflow:demo-change'
+import { isLiveWorkspaceMode } from './workspaceMode.js'
 const defaults = {
   employees: [
     { id:'RF-1042', avatarSeed:'RF-1042', name:'Aarav Mehta', role:'Customer Support', email:'aarav@northstar.example', brand:'Nike', pod:'Pod Alpha', off:6, status:'Active', crossTrainedFor:['Returns'] },
@@ -19,14 +20,21 @@ const defaults = {
   holidays: [],
   conflictHistory: [],
 }
-export function getDemo(key, fallback) {
+export function getDemo(key, fallback, { isLiveMode = isLiveWorkspaceMode() } = {}) {
   try {
-    const value = localStorage.getItem(`rosterflow.demo.${key}`)
+    const storageKey = `rosterflow.demo.${key}`
+    const value = localStorage.getItem(storageKey)
     if (value !== null) {
       const parsed = JSON.parse(value)
       if (key === 'employees' && Array.isArray(parsed)) {
+        if (!isLiveMode && parsed.length === 0 && defaults.employees.length === 6) {
+          const restored = defaults.employees.map(employee => ({ ...employee, avatarSeed: employee.avatarSeed || String(employee.id || employee.employeeCode || employee.name) }))
+          localStorage.setItem(storageKey, JSON.stringify(restored))
+          window.dispatchEvent(new CustomEvent(demoEvent, { detail: { key, value: restored } }))
+          return restored
+        }
         const upgraded = parsed.map(employee => ({ ...employee, avatarSeed: employee.avatarSeed || String(employee.id || employee.employeeCode || employee.name) }))
-        if (upgraded.some((employee, index) => employee.avatarSeed !== parsed[index].avatarSeed)) localStorage.setItem(`rosterflow.demo.${key}`, JSON.stringify(upgraded))
+        if (upgraded.some((employee, index) => employee.avatarSeed !== parsed[index].avatarSeed)) localStorage.setItem(storageKey, JSON.stringify(upgraded))
         return upgraded
       }
       return parsed
